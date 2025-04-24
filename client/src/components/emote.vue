@@ -2,11 +2,6 @@
   <div ref="emote" @click.stop.prevent="run" class="emote-container">
     <div :class="classes" />
     <div :class="classes" />
-    <div :class="classes" />
-    <div :class="classes" />
-    <div :class="classes" />
-    <div :class="classes" />
-    <div :class="classes" />
   </div>
 </template>
 
@@ -50,6 +45,8 @@
 
     mounted() {
       const range = 50
+      const offset = 40
+
       let count = 0
       let finish: Array<Promise<any>> = []
 
@@ -57,15 +54,15 @@
 
       for (let child of this.container.children) {
         const ele = child as HTMLElement
-        ele.style['left'] = `${count % 2 ? this.$anime.random(0, range) : this.$anime.random(-range, 0)}%`
+        ele.style['left'] = `${count % 2 ? this.$anime.random(0, range) : this.$anime.random(-range, 0) + offset}%`
         ele.style['opacity'] = `0`
 
         const animation = this.$anime({
           targets: child,
           keyframes: [
-            { left: `${count % 2 ? this.$anime.random(0, range) : this.$anime.random(-range, 0)}%`, opacity: 1 },
-            { left: `${count % 2 ? this.$anime.random(-range, 0) : this.$anime.random(0, range)}%`, opacity: 0.5 },
-            { left: `${count % 2 ? this.$anime.random(0, range) : this.$anime.random(-range, 0)}%`, opacity: 0 },
+            { left: `${count % 2 ? this.$anime.random(0, range) : this.$anime.random(-range, 0) + offset}%`, opacity: 1 },
+            { left: `${count % 2 ? this.$anime.random(-range, 0) : this.$anime.random(0, range) + offset}%`, opacity: 0.5 },
+            { left: `${count % 2 ? this.$anime.random(0, range) : this.$anime.random(-range, 0) + offset}%`, opacity: 0 },
           ],
           elasticity: 600,
           rotate: this.$anime.random(-35, 35),
