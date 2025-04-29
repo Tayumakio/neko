@@ -8,6 +8,7 @@ export const state = () => ({
   tab: get<string>('tab', 'chat'),
   about: false,
   about_page: '',
+  theaterMode: get<boolean>('theaterMode', false),
 })
 
 export const getters = getterTree(state, {})
@@ -30,6 +31,14 @@ export const mutations = mutationTree(state, {
   setSide(state, side: boolean) {
     state.side = side
     set('side', side)
+  },
+  toggleTheaterMode(state) {
+    state.theaterMode = !state.theaterMode
+    set('theaterMode', state.theaterMode)
+  },
+  setTheaterMode(state, theaterMode: boolean) {
+    state.theaterMode = theaterMode
+    set('theaterMode', theaterMode)
   },
 })
 

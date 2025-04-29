@@ -1,5 +1,5 @@
 <template>
-  <div id="neko" :class="[!videoOnly && side ? 'expanded' : '']">
+  <div id="neko" :class="[!videoOnly && side ? 'expanded' : '', theaterMode ? 'theater-mode' : '']">
     <template v-if="!$client.supported">
       <neko-unsupported />
     </template>
@@ -27,6 +27,13 @@
             </div>
             <div class="emotes">
               <neko-emotes />
+            </div>
+            <div class="video-controls">
+              <ul class="video-menu">
+                <li><i @click.stop.prevent="requestFullscreen" class="fas fa-expand"></i></li>
+                <li><i @click.stop.prevent="toggleTheaterMode" class="fas fa-film" v-tooltip="{ content: $t('setting.theater_mode'), placement: 'top', offset: 5, boundariesElement: 'body' }"></i></li>
+                <li v-if="admin"><i @click.stop.prevent="openResolution" class="fas fa-desktop"></i></li>
+              </ul>
             </div>
           </div>
         </div>
@@ -114,6 +121,92 @@
             align-items: center;
             display: flex;
           }
+
+          .video-controls {
+            margin-right: 10px;
+            flex-shrink: 0;
+            justify-content: flex-end;
+            align-items: center;
+            display: flex;
+
+            .video-menu {
+              display: flex;
+
+              li {
+                margin: 0 5px;
+
+                i {
+                  width: 30px;
+                  height: 30px;
+                  background: rgba($color: #fff, $alpha: 0.2);
+                  border-radius: 5px;
+                  line-height: 30px;
+                  font-size: 16px;
+                  text-align: center;
+                  color: rgba($color: #fff, $alpha: 0.6);
+                  cursor: pointer;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.theater-mode {
+      .neko-main {
+        .video-container {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: 10;
+        }
+
+        .header-container {
+          opacity: 0;
+          transition: opacity 0.3s;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          z-index: 15;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        .room-container {
+          opacity: 0;
+          transition: opacity 0.3s;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: calc(100% - $side-width);
+          z-index: 15;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+
+      .neko-menu {
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 30;
+        background-color: rgba($background-primary, 0.1);
+
+        .chat-history {
+          li {
+            background-color: rgba($background-primary, 0.5);
+            opacity: 1;
+          }
+          opacity: 1;
         }
       }
     }
@@ -201,6 +294,10 @@
 
     shakeKbd = false
 
+    get admin() {
+      return this.$accessor.user.admin
+    }
+
     get volume() {
       const numberParam = parseFloat(new URL(location.href).searchParams.get('volume') || '1.0')
       return Math.max(0.0, Math.min(!isNaN(numberParam) ? numberParam * 100 : 100, 100))
@@ -266,8 +363,24 @@
       return this.$accessor.client.side
     }
 
+    get theaterMode() {
+      return this.$accessor.client.theaterMode
+    }
+
     get connected() {
       return this.$accessor.connected
+    }
+
+    requestFullscreen() {
+      this.video.requestFullscreen()
+    }
+
+    toggleTheaterMode() {
+      this.$accessor.client.toggleTheaterMode()
+    }
+
+    openResolution(event: MouseEvent) {
+      this.video.openResolution(event)
     }
   }
 </script>

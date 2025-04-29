@@ -36,8 +36,6 @@
         <div ref="aspect" class="player-aspect" />
       </div>
       <ul v-if="!fullscreen && !hideControls" class="video-menu top">
-        <li><i @click.stop.prevent="requestFullscreen" class="fas fa-expand"></i></li>
-        <li v-if="admin"><i @click.stop.prevent="openResolution" class="fas fa-desktop"></i></li>
         <li v-if="!controlLocked && !implicitHosting" :class="extraControls || 'extra-control'">
           <i
             :class="[
@@ -835,6 +833,10 @@
     openMobileKeyboard() {
       // focus opens the keyboard on mobile
       this._overlay.focus()
+    }
+
+    toggleTheaterMode() {
+      this.$accessor.client.toggleTheaterMode()
     }
   }
 </script>

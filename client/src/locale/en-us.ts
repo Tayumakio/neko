@@ -89,6 +89,7 @@ export const setting = {
   chat_sound: 'Play Chat Sound',
   keyboard_layout: 'Keyboard Layout',
   broadcast_title: 'Live Broadcast',
+  theater_mode: 'Theater Mode',
 }
 
 export const connection = {

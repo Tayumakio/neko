@@ -90,6 +90,7 @@ export const setting = {
   chat_sound: 'Проигрывать звук чата',
   keyboard_layout: 'Раскладка клавиатуры',
   broadcast_title: 'Прямой эфир',
+  theater_mode: 'Режим театра',
 }
 
 export const connection = {
