@@ -71,6 +71,7 @@ func (m *Manager) sendMessage(session types.Session, content Content) {
 	// Create the message
 	message := Message{
 		ID:      session.ID(),
+		Name:    session.Profile().Name,
 		Created: time.Now(),
 		Content: content,
 	}

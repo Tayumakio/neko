@@ -190,6 +190,7 @@ export interface ChatSendPayload {
 }
 export interface ChatPayload {
   id: string
+  name?: string
   content: string
   created: string | Date
 }

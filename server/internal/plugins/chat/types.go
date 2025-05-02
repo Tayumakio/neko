@@ -5,21 +5,22 @@ import "time"
 const PluginName = "chat"
 
 const (
-	CHAT_INIT    = "chat/init"
-	CHAT_MESSAGE = "chat/message"
+  CHAT_INIT    = "chat/init"
+  CHAT_MESSAGE = "chat/message"
 )
 
 type Init struct {
-	Enabled bool      `json:"enabled"`
-	History []Message `json:"history"`
+  Enabled bool      `json:"enabled"`
+  History []Message `json:"history"`
 }
 
 type Content struct {
-	Text string `json:"text"`
+  Text string `json:"text"`
 }
 
 type Message struct {
-	ID      string    `json:"id"`
-	Created time.Time `json:"created"`
-	Content Content   `json:"content"`
+  ID      string    `json:"id"`
+  Name    string    `json:"name"`
+  Created time.Time `json:"created"`
+  Content Content   `json:"content"`
 }

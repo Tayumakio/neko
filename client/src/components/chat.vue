@@ -10,12 +10,12 @@
             bulk: index > 0 && history[index - 1].id == message.id && history[index - 1].type === 'text',
           }"
         >
-          <div class="author" @contextmenu.stop.prevent="onContext($event, { member: member(message.id) })">
-            <neko-avatar class="avatar" :seed="member(message.id).displayname" :size="40" />
+          <div class="author" @contextmenu.stop.prevent="onContext($event, { member: member(message.id, message.name) })">
+            <neko-avatar class="avatar" :seed="message.name" :size="40" />
           </div>
           <div class="content">
             <div class="content-head">
-              <span>{{ member(message.id).displayname }}</span>
+              <span>{{ message.name }}</span>
               <span class="timestamp">{{ timestamp(message.created) }}</span>
             </div>
             <neko-markdown class="content-body" :source="message.content" />
@@ -32,7 +32,7 @@
             }"
           >
             <strong v-if="message.id === id && $te('you')">{{ $t('you') }}</strong>
-            <strong v-else>{{ member(message.id).displayname }}</strong>
+            <strong v-else>{{ message.name }}</strong>
             {{ message.content }}
           </div>
         </li>
@@ -403,8 +403,12 @@
       })
     }
 
-    member(id: string) {
-      return this.$accessor.user.members[id] || { id, displayname: id }
+    member(id: string, name?: string): Member | null {
+      return (
+        this.$accessor.user.members[id] ||
+        (name && Object.values(this.$accessor.user.members).find((member) => member.displayname === name)) ||
+        null
+      )
     }
 
     timestamp(time: Date | string) {
@@ -437,9 +441,10 @@
     }
 
     onContext(event: MouseEvent, { member }: { member: Member }) {
-      if (member.id === this.id) {
+      if (member.id === this.id || !member) {
         return
       }
+
       this._context.open(event, { member })
     }
 
