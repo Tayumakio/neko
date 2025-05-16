@@ -341,8 +341,10 @@ export class NekoClient extends BaseClient implements EventEmitter<NekoEvents> {
     if (history && history.length > 0) {
       // Process messages in chronological order
       for (const message of history) {
+        const member = this.member(message.id)
         this.$accessor.chat.newMessage({
           id: message.id,
+          name: member ? member.displayname : message.name,
           content: message.content,
           type: 'text',
           created: message.created,
@@ -359,6 +361,7 @@ export class NekoClient extends BaseClient implements EventEmitter<NekoEvents> {
 
     this.$accessor.chat.newMessage({
       id,
+      name: member.displayname,
       content,
       type: 'text',
       created: created,
