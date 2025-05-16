@@ -9,6 +9,7 @@ export const state = () => ({
   about: false,
   about_page: '',
   theaterMode: get<boolean>('theaterMode', false),
+  chatWidth: get<number>('chatWidth', 350),
 })
 
 export const getters = getterTree(state, {})
@@ -39,6 +40,10 @@ export const mutations = mutationTree(state, {
   setTheaterMode(state, theaterMode: boolean) {
     state.theaterMode = theaterMode
     set('theaterMode', theaterMode)
+  },
+  setChatWidth(state, width: number) {
+    state.chatWidth = width
+    set('chatWidth', width)
   },
 })
 

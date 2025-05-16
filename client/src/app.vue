@@ -184,7 +184,7 @@
           position: fixed;
           bottom: 0;
           left: 0;
-          width: calc(100% - $side-width);
+          width: calc(100% - v-bind(chatWidth));
           z-index: 15;
 
           &:hover {
@@ -198,8 +198,17 @@
         right: 0;
         top: 0;
         height: 100vh;
+        width: v-bind(chatWidth);
         z-index: 30;
         background-color: rgba($background-primary, 0.1);
+        resize: horizontal;
+        overflow: auto;
+        border-left: 5px solid rgba($color: #fff, $alpha: 0.1);
+
+        &:hover {
+          border-left: 5px solid rgba($color: #fff, $alpha: 0.3);
+          cursor: ew-resize;
+        }
 
         .chat-history {
           li {
@@ -365,6 +374,10 @@
 
     get theaterMode() {
       return this.$accessor.client.theaterMode
+    }
+
+    get chatWidth() {
+      return this.$accessor.client.chatWidth + 'px'
     }
 
     get connected() {

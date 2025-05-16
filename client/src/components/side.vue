@@ -1,5 +1,5 @@
 <template>
-  <aside class="neko-menu">
+  <aside class="neko-menu" ref="menu">
     <div class="tabs-container">
       <ul>
         <li :class="{ active: tab === 'chat' }" @click.stop.prevent="change('chat')">
@@ -79,7 +79,7 @@
 </style>
 
 <script lang="ts">
-  import { Vue, Component, Watch } from 'vue-property-decorator'
+  import { Vue, Component, Watch, Ref } from 'vue-property-decorator'
 
   import Settings from '~/components/settings.vue'
   import Chat from '~/components/chat.vue'
@@ -94,6 +94,10 @@
     },
   })
   export default class extends Vue {
+    @Ref('menu') readonly menu!: HTMLElement;
+    private resizeObserver: ResizeObserver | null = null;
+    private windowResizeHandler: (() => void) | null = null;
+
     get filetransferAllowed() {
       return (
         this.$accessor.remote.fileTransfer && (this.$accessor.user.admin || !this.$accessor.isLocked('file_transfer'))
@@ -102,6 +106,115 @@
 
     get tab() {
       return this.$accessor.client.tab
+    }
+
+    get theaterMode() {
+      return this.$accessor.client.theaterMode
+    }
+
+    mounted() {
+      this.setupResizeObserver();
+      this.setupWindowResizeHandler();
+    }
+
+    beforeDestroy() {
+      this.cleanupResizeObserver();
+      this.cleanupWindowResizeHandler();
+    }
+
+    setupWindowResizeHandler() {
+      if (!this.windowResizeHandler) {
+        this.windowResizeHandler = () => {
+          if (this.theaterMode && this.menu) {
+            // Get the current width
+            const currentWidth = this.menu.getBoundingClientRect().width;
+
+            // Constrain the width to reasonable limits
+            const minWidth = 250; // Minimum width in pixels
+            const maxWidth = window.innerWidth * 0.5; // Maximum width is 50% of window width
+            const newWidth = Math.max(minWidth, Math.min(currentWidth, maxWidth));
+
+            // Set the width of the menu element if it needs to be constrained
+            if (newWidth !== currentWidth) {
+              this.menu.style.width = `${newWidth}px`;
+              this.$accessor.client.setChatWidth(newWidth);
+            }
+          }
+        };
+
+        window.addEventListener('resize', this.windowResizeHandler);
+      }
+    }
+
+    cleanupWindowResizeHandler() {
+      if (this.windowResizeHandler) {
+        window.removeEventListener('resize', this.windowResizeHandler);
+        this.windowResizeHandler = null;
+      }
+    }
+
+    @Watch('theaterMode')
+    onTheaterModeChange() {
+      // Re-setup the observers when theater mode changes
+      this.$nextTick(() => {
+        // Clean up and re-setup resize observer
+        this.cleanupResizeObserver();
+        this.setupResizeObserver();
+
+        // Clean up and re-setup window resize handler
+        this.cleanupWindowResizeHandler();
+        this.setupWindowResizeHandler();
+
+        // If entering theater mode, initialize the chat width
+        if (this.theaterMode && this.menu) {
+          // Get the stored width from the store
+          const storedWidth = this.$accessor.client.chatWidth;
+
+          // Constrain the width to reasonable limits
+          const minWidth = 250; // Minimum width in pixels
+          const maxWidth = window.innerWidth * 0.5; // Maximum width is 50% of window width
+          const newWidth = Math.max(minWidth, Math.min(storedWidth, maxWidth));
+
+          // Set the width of the menu element
+          this.menu.style.width = `${newWidth}px`;
+
+          // Update the store if the width was constrained
+          if (newWidth !== storedWidth) {
+            this.$accessor.client.setChatWidth(newWidth);
+          }
+        }
+      });
+    }
+
+    setupResizeObserver() {
+      if (!this.resizeObserver && this.menu) {
+        this.resizeObserver = new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            if (entry.target === this.menu && this.theaterMode) {
+              // Constrain the width to reasonable limits
+              const minWidth = 250; // Minimum width in pixels
+              const maxWidth = window.innerWidth * 0.5; // Maximum width is 50% of window width
+              const newWidth = Math.max(minWidth, Math.min(entry.contentRect.width, maxWidth));
+
+              // Update the chat width in the store
+              this.$accessor.client.setChatWidth(newWidth);
+
+              // If the width was constrained, update the element's width
+              if (newWidth !== entry.contentRect.width) {
+                this.menu.style.width = `${newWidth}px`;
+              }
+            }
+          }
+        });
+        this.resizeObserver.observe(this.menu);
+      }
+    }
+
+    cleanupResizeObserver() {
+      if (this.resizeObserver) {
+        this.resizeObserver.disconnect();
+        this.resizeObserver = null;
+      }
     }
 
     @Watch('tab', { immediate: true })
