@@ -1,5 +1,5 @@
 <template>
-  <div id="neko" :class="[!videoOnly && side ? 'expanded' : '', theaterMode ? 'theater-mode' : '']">
+  <div id="neko" :class="[!videoOnly && side ? 'expanded' : '', theaterMode ? 'theater-mode' : '']" :style="{'--chat-width': chatWidth}">
     <template v-if="!$client.supported">
       <neko-unsupported />
     </template>
@@ -184,7 +184,7 @@
           position: fixed;
           bottom: 0;
           left: 0;
-          width: calc(100% - v-bind(chatWidth));
+          width: calc(100% - var(--chat-width));
           z-index: 15;
 
           &:hover {
@@ -198,7 +198,7 @@
         right: 0;
         top: 0;
         height: 100vh;
-        width: v-bind(chatWidth);
+        width: var(--chat-width);
         z-index: 30;
         background-color: rgba($background-primary, 0.1);
         resize: horizontal;
@@ -298,7 +298,7 @@
       'neko-unsupported': Unsupported,
     },
   })
-  export default class extends Vue {
+  export default class App extends Vue {
     @Ref('video') video!: Video
 
     shakeKbd = false
